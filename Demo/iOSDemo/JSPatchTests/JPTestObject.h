@@ -68,6 +68,7 @@
 @property (nonatomic, assign) BOOL funcToSwizzleReturnRangeJSPassed;
 @property (nonatomic, assign) BOOL funcToSwizzleReturnEdgeInsetsJSPassed;
 @property (nonatomic, assign) BOOL funcToSwizzleTestGCDPassed;
+@property (nonatomic, assign) BOOL funcToSwizzleTestGCDPassedViaGlobalQueuePassed;
 @property (nonatomic, assign) BOOL funcToSwizzleTestClassPassed;
 @property (nonatomic, assign) BOOL funcToSwizzleTestSelectorPassed;
 @property (nonatomic, assign) BOOL funcToSwizzleTestCharPassed;
@@ -111,6 +112,8 @@
 
 - (NSString*)funcOverrideParentMethod;
 - (void)funcToSwizzleTestGCD:(void(^)())block;
+- (void)funcToSwizzleTestGCDViaGlobalQueue:(void (^)())block;
+- (void)funcToSwizzleTestGCDViaGlobalQueueJS:(void (^)())block;
 
 - (NSDictionary *)funcToSwizzleReturnDictionary:(NSDictionary *)dict;
 - (NSDictionary *)funcToSwizzleReturnJSDictionary;

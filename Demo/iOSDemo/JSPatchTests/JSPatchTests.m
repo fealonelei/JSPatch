@@ -174,8 +174,17 @@
     }];
     
     while (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW))
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                 beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+    
+    dispatch_semaphore_t semaphoreAsync = dispatch_semaphore_create(0);
+    [obj funcToSwizzleTestGCDViaGlobalQueue:^{
+        XCTAssert(obj.funcToSwizzleTestGCDPassedViaGlobalQueuePassed, @"funcToSwizzleTestGCDPassedViaGlobalQueuePassed");
+        dispatch_semaphore_signal(semaphoreAsync);
+    }];
+    while (dispatch_semaphore_wait(semaphoreAsync, DISPATCH_TIME_NOW))
+    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
 }
 
 - (void)testJSClass

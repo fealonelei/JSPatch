@@ -78,6 +78,20 @@ require('JPEngine').defineStruct({
       dispatch_sync_main(dispatchExecBlock);
       dispatch_after(1, dispatchExecBlock);
     },
+    funcToSwizzleTestGCDViaGlobalQueueJS: function(completeBlock) {
+      var execCount = 0
+      var slf = self
+      var dispatchExecBlock = function() {
+        if (++execCount >= 4) {
+          slf.setFuncToSwizzleTestGCDPassedViaGlobalQueuePassed(1)
+          completeBlock()
+        }
+      }
+      dispatch_async_main(dispatchExecBlock);
+      dispatch_async_global_queue(dispatchExecBlock);
+      dispatch_sync_main(dispatchExecBlock);
+      dispatch_after(1, dispatchExecBlock);
+    },
     funcToSwizzleTestClass: function(cls) {
       return cls
     },

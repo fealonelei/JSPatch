@@ -331,6 +331,13 @@ typedef struct {
     
 }
 
+- (void)funcToSwizzleTestGCDViaGlobalQueue:(void (^)())block
+{
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self funcToSwizzleTestGCDViaGlobalQueueJS:block];
+    });
+}
+
 - (Class)funcToSwizzleTestClass:(Class)cls
 {
     return nil;

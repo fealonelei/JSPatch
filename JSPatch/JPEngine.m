@@ -73,6 +73,9 @@ void (^_exceptionBlock)(NSString *log) = ^void(NSString *log) {
     NSCAssert(NO, log);
 };
 
+static int kJSPatchMainQueueKey;
+CFStringRef kJSPatchMainQueueValue = CFSTR("com.jspatch.main.queue.value");
+
 @implementation JPEngine
 
 #pragma mark - APIS
@@ -82,6 +85,11 @@ void (^_exceptionBlock)(NSString *log) = ^void(NSString *log) {
     if (![JSContext class] || _context) {
         return;
     }
+    
+    dispatch_queue_set_specific(dispatch_get_main_queue(),
+                                &kJSPatchMainQueueKey,
+                                (void *)kJSPatchMainQueueValue,
+                                (dispatch_function_t)CFRelease);
     
     JSContext *context = [[JSContext alloc] init];
     
@@ -168,15 +176,18 @@ void (^_exceptionBlock)(NSString *log) = ^void(NSString *log) {
     };
     
     context[@"dispatch_sync_main"] = ^(JSValue *func) {
-        if ([NSThread currentThread].isMainThread) {
+        CFStringRef retrievedValue = dispatch_get_specific(&kJSPatchMainQueueKey);
+        if (retrievedValue == kJSPatchMainQueueValue) {
             [func callWithArguments:nil];
         } else {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [func callWithArguments:nil];
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [func callWithArguments:nil];
+                });
             });
         }
     };
-    
+
     context[@"dispatch_async_global_queue"] = ^(JSValue *func) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             [func callWithArguments:nil];
