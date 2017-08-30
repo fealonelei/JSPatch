@@ -167,24 +167,25 @@
     JPTestProtocolObject *testProtocolObj = [[JPTestProtocolObject alloc] init];
     XCTAssert([testProtocolObj testProtocolMethods], @"testProtocolMethodsPassed");
     
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    [obj funcToSwizzleTestGCD:^{
-        XCTAssert(obj.funcToSwizzleTestGCDPassed, @"funcToSwizzleTestGCDPassed");
-        dispatch_semaphore_signal(semaphore);
-    }];
-    
-    while (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW))
-    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+//    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+//    [obj funcToSwizzleTestGCD:^{
+//        XCTAssert(obj.funcToSwizzleTestGCDPassed, @"funcToSwizzleTestGCDPassed");
+//        dispatch_semaphore_signal(semaphore);
+//    }];
+//    
+//    while (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW))
+//    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+//                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
     
     dispatch_semaphore_t semaphoreAsync = dispatch_semaphore_create(0);
     [obj funcToSwizzleTestGCDViaGlobalQueue:^{
         XCTAssert(obj.funcToSwizzleTestGCDPassedViaGlobalQueuePassed, @"funcToSwizzleTestGCDPassedViaGlobalQueuePassed");
         dispatch_semaphore_signal(semaphoreAsync);
     }];
-    while (dispatch_semaphore_wait(semaphoreAsync, DISPATCH_TIME_NOW))
-    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+    dispatch_semaphore_wait(semaphoreAsync, DISPATCH_TIME_FOREVER);
+//    while (dispatch_semaphore_wait(semaphoreAsync, DISPATCH_TIME_NOW))
+//    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+//                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:10]];
 }
 
 - (void)testJSClass

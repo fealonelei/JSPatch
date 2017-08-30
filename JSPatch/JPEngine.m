@@ -180,11 +180,14 @@ CFStringRef kJSPatchMainQueueValue = CFSTR("com.jspatch.main.queue.value");
         if (retrievedValue == kJSPatchMainQueueValue) {
             [func callWithArguments:nil];
         } else {
-            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//                dispatch_sync(dispatch_get_main_queue(), ^{
+//                    [func callWithArguments:nil];
+//                });
+//            });
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     [func callWithArguments:nil];
                 });
-            });
         }
     };
 
